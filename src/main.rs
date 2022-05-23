@@ -1,5 +1,6 @@
 extern crate sdl2;
 
+use sdl2::mouse::MouseButton;
 use sdl2::rect::Rect;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
@@ -14,7 +15,6 @@ struct Enemy {
     y: i32,
     width: u32,
     height: u32,
-    rect: Rect,
 }
 
 impl Enemy {
@@ -24,37 +24,25 @@ impl Enemy {
             y,
             width,
             height,
-            rect: Rect::new(x, y, width, height),
         }
     }
 
-    fn move_enemy(&mut self) {
-        self.x = self.x + 100;
-    }
-
-    // fn draw(&self, &mut canvas: &mut Canvas<sdl2::video::Window>) {
-    //     canvas.fill_rect(Rect::new(self.x, self.y, self.width.try_into().unwrap(), self.height.try_into().unwrap())).unwrap();
-    // }
-
     fn draw(&self, canvas: &mut Canvas<Window>) {
         canvas.set_draw_color(Color::RGB(255, 255, 255));
-        //canvas.fill_rect(Rect::new(self.x, self.y, self.width.try_into().unwrap(), self.height.try_into().unwrap())).unwrap();
-        canvas.fill_rect(self.rect).unwrap();
+        canvas.fill_rect(Rect::new(self.x, self.y, self.width.try_into().unwrap(), self.height.try_into().unwrap())).unwrap();
     }
 }
 
-pub fn main() {
-    let sdl_context = sdl2::init().unwrap();
-    let video_subsystem = sdl_context.video().unwrap();
+pub fn main() -> Result<(), String> {
+    let sdl_context = sdl2::init()?;
+    let video_subsystem = sdl_context.video()?;
 
     let window = video_subsystem.window("rust-sdl2 demo", 800, 600)
         .position_centered()
         .build()
         .unwrap();
 
-    let mut enemy = Enemy::new(0, 0, 100, 100);
-
-    let abc = Rect::new(100, 100, 10, 10);
+    let enemy = Enemy::new(0, 0, 100, 100);
 
     let mut canvas = window.into_canvas().build().unwrap();
     let mut event_pump = sdl_context.event_pump().unwrap();
@@ -64,31 +52,43 @@ pub fn main() {
         canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
         canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
-        // canvas.fill_rect(Rect::new(enemy.x, enemy.y, enemy.width.try_into().unwrap(), enemy.height.try_into().unwrap())).unwrap();
-        
-        canvas.fill_rect(abc);
 
-        // println!("{}", i);
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..} |
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     break 'running
                 },
-                Event::KeyDown {
-                    keycode: Some(Keycode::Right),
-                    ..
-                } => {
-                    enemy.move_enemy();
+                Event::KeyDown { keycode: Some(Keycode::Left), .. } |
+                Event::KeyDown { keycode: Some(Keycode::Right), .. } |
+                Event::KeyDown { keycode: Some(Keycode::Up), .. } |
+                Event::KeyDown { keycode: Some(Keycode::Down), .. } => {
+                    println!("arrow key pressed");
+                },
+                Event::MouseButtonDown { mouse_btn: MouseButton::Left, .. } => {
+                    // let new_event = event.clone();
+                    // let { timestamp, window_id, which, mouse_btn, clicks, x, y } = event.clone();
+                    println!("left mouse button pressed!: {:?}", event);
+                    //event.mouse_state();
+
+                    // println!("event_pump.mouse_state(): {:?}", event_pump.mouse_state());
+                    //println!();
                 }
-                _ => {}
+                _ => {
+                    println!("nothin happenin");
+                }
             }
         }
         // The rest of the game loop goes here...
-        
         enemy.draw(&mut canvas);
 
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
+    
+    Ok(())
+}
+
+fn print_type_of<T>(_: &T) {
+    println!("{}", std::any::type_name::<T>())
 }
