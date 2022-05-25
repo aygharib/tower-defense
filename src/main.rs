@@ -1,7 +1,7 @@
 extern crate sdl2;
 
 use sdl2::mouse::{MouseButton, PressedMouseButtonIterator};
-use sdl2::rect::Rect;
+use sdl2::rect::{Rect, Point};
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -10,6 +10,28 @@ use std::time::Duration;
 
 use sdl2::video::Window;
 use sdl2::render::Canvas;
+
+struct Turret {
+    x: i32,
+    y: i32,
+    width: u32,
+    height: u32,
+}
+impl Turret {
+    fn new(x: i32, y: i32, width: u32, height: u32) -> Turret {
+        Turret {
+            x,
+            y,
+            width,
+            height,
+        }
+    }
+
+    fn draw(&self, canvas: &mut Canvas<Window>) {
+        canvas.set_draw_color(Color::RGB(255, 255, 255));
+        canvas.fill_rect(Rect::new(self.x, self.y, self.width.try_into().unwrap(), self.height.try_into().unwrap())).unwrap();
+    }
+}
 
 struct Enemy {
     x: i32,
@@ -40,6 +62,26 @@ impl Enemy {
     }
 }
 
+fn draw_arena(canvas: &mut Canvas<Window>) {
+    canvas.set_draw_color(Color::RGB(255, 255, 255));
+
+    canvas.draw_line(Point::new(0, 50), Point::new(1920-50, 50));
+    canvas.draw_line(Point::new(1920-50, 50), Point::new(1920-50, 150));
+    canvas.draw_line(Point::new(0, 150), Point::new(1920-50, 150));
+
+    canvas.draw_line(Point::new(0, 50), Point::new(1920-50, 50));
+    canvas.draw_line(Point::new(1920-50, 50), Point::new(1920-50, 150));
+    canvas.draw_line(Point::new(0, 150), Point::new(1920-50, 150));
+}
+
+fn draw_hovered_tile(canvas: &mut Canvas<Window>, mouse_x: i32, mouse_y: i32) {
+    let temp_x = (mouse_x / 50) * 50;
+    let temp_y = (mouse_y / 50) * 50;
+
+    canvas.set_draw_color(Color::RGB(128, 128, 128));
+    canvas.fill_rect(Rect::new(temp_x, temp_y, 50, 50));
+}
+
 pub fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
@@ -50,7 +92,7 @@ pub fn main() -> Result<(), String> {
         .build()
         .unwrap();
 
-    let mut enemy = Enemy::new(0, 0, 100, 100, 25);
+    let mut enemy = Enemy::new(0, 0, 50, 50, 25);
 
     let mut canvas = window.into_canvas().build().unwrap();
     let mut event_pump = sdl_context.event_pump().unwrap();
@@ -98,6 +140,8 @@ pub fn main() -> Result<(), String> {
         }
 
         enemy.draw(&mut canvas);
+        draw_arena(&mut canvas);
+        draw_hovered_tile(&mut canvas, mouse_state.x(), mouse_state.y());
 
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
@@ -105,6 +149,7 @@ pub fn main() -> Result<(), String> {
     
     Ok(())
 }
+
 
 fn print_type_of<T>(_: &T) {
     println!("{}", std::any::type_name::<T>())
