@@ -11,68 +11,11 @@ use std::time::Duration;
 use sdl2::video::Window;
 use sdl2::render::Canvas;
 
-struct Turret {
-    x: f64,
-    y: f64,
-    width: u32,
-    height: u32,
-}
-impl Turret {
-    fn new(x: f64, y: f64, width: u32, height: u32) -> Turret {
-        Turret {
-            x,
-            y,
-            width,
-            height,
-        }
-    }
+mod enemy;
+mod arena;
 
-    fn draw(&self, canvas: &mut Canvas<Window>) {
-        canvas.set_draw_color(Color::RGB(255, 255, 255));
-        canvas.fill_rect(Rect::new(self.x as i32, self.y as i32, self.width.try_into().unwrap(), self.height.try_into().unwrap())).unwrap();
-    }
-}
-
-struct Enemy {
-    x: f64,
-    y: f64,
-    width: u32,
-    height: u32,
-    speed: i32, // num pixels moved per second
-}
-impl Enemy {
-    fn new(x: f64, y: f64, width: u32, height: u32, speed: i32) -> Enemy {
-        Enemy {
-            x,
-            y,
-            width,
-            height,
-            speed,
-        }
-    }
-
-    fn draw(&self, canvas: &mut Canvas<Window>) {
-        canvas.set_draw_color(Color::RGB(255, 255, 255));
-        canvas.draw_rect(Rect::new(self.x as i32, self.y as i32, self.width.try_into().unwrap(), self.height.try_into().unwrap())).unwrap();
-    }
-
-    fn update_position(&mut self, delta_x: f64, delta_y: f64) {
-        self.x = self.x + delta_x * self.speed as f64;
-        self.y = self.y + delta_y * self.speed as f64;
-    }
-}
-
-fn draw_arena(canvas: &mut Canvas<Window>) {
-    canvas.set_draw_color(Color::RGB(255, 255, 255));
-
-    canvas.draw_line(Point::new(0, 50), Point::new(1920-50, 50));
-    canvas.draw_line(Point::new(1920-50, 50), Point::new(1920-50, 150));
-    canvas.draw_line(Point::new(10, 150), Point::new(1920-50, 150));
-
-    canvas.draw_line(Point::new(0, 50), Point::new(1920-50, 50));
-    canvas.draw_line(Point::new(1920-50, 50), Point::new(1920-50, 150));
-    canvas.draw_line(Point::new(0, 150), Point::new(1920-50, 150));
-}
+use crate::enemy::Enemy;
+use crate::arena::Arena;
 
 fn draw_hovered_tile(canvas: &mut Canvas<Window>, mouse_x: i32, mouse_y: i32) {
     let temp_x = (mouse_x / 50) * 50;
@@ -85,25 +28,20 @@ fn draw_hovered_tile(canvas: &mut Canvas<Window>, mouse_x: i32, mouse_y: i32) {
 pub fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
     let video_subsystem = sdl_context.video()?;
-
-    let timer_subsystem = sdl_context.timer().unwrap();
-
     let window = video_subsystem.window("rust-sdl2 demo", 800, 600)
-        // .fullscreen_desktop()
         .position_centered()
         .build()
         .unwrap();
 
+    let arena = Arena::new(1920, 1080);
+
     let mut listEnemies: Vec<Enemy> = Vec::new();
     listEnemies.push(Enemy::new(100.0, 0.0, 50, 50, 1));
     listEnemies.push(Enemy::new(200.0, 0.0, 50, 50, 2));
-    listEnemies.push(Enemy::new(300.0, 0.0, 50, 50, 25));
+    listEnemies.push(Enemy::new(300.0, 0.0, 50, 50, 3));
 
     let mut canvas = window.into_canvas().build().unwrap();
     let mut event_pump = sdl_context.event_pump().unwrap();
-
-    let mut delta_ticks = 0;
-    let mut last_tick_time = 0;
 
     'running: loop {
         canvas.set_draw_color(Color::RGB(0, 0, 0));
@@ -122,44 +60,17 @@ pub fn main() -> Result<(), String> {
             }
         }
 
-        // get mouse state
-        let mouse_state = event_pump.mouse_state();
-
-        // create set of pressed mouse buttons
-        let pressed_mouse_buttons: HashSet<MouseButton> = mouse_state.pressed_mouse_buttons().collect();
-        
-        if !pressed_mouse_buttons.is_empty() {
-            println!("X = {:?}, Y = {:?} : {:?}", mouse_state.x(), mouse_state.y(), pressed_mouse_buttons);
-        }
-
-        let tick_time = timer_subsystem.ticks();
-        delta_ticks = tick_time - last_tick_time;
-        last_tick_time = tick_time;
-        //let total_ticks = whatever.ticks(); // this increments by 1000 per second
-        println!("Total Ticks: {} | Delta Ticks: {}", tick_time, delta_ticks); 
-
-        // Update
         for val in listEnemies.iter_mut() {
-            let change_in_x = val.speed as f64 * delta_ticks as f64 / 1000.0;
-            let old_x = val.x;
-            val.update_position(change_in_x, 0.0);
-
-            let new_x = val.x;
-
-            println!("old_x: {}, new_x: {}, change_in_x: {}", old_x, new_x, change_in_x);
-            // 25 * 18 = 450
-            // 450 / 1000 = 0.45
-            // 0.45 * 
+            val.update_position(1.0, 0.0);
         }
 
         // Render
-        draw_arena(&mut canvas);
-        draw_hovered_tile(&mut canvas, mouse_state.x(), mouse_state.y());
+        arena.draw_arena(&mut canvas);
+        // draw_hovered_tile(&mut canvas, mouse_state.x(), mouse_state.y());
 
         for val in listEnemies.iter() {
             val.draw(&mut canvas);
         }
-
 
         canvas.present();
         // sleeps for 1/60 th of a second.
@@ -167,9 +78,4 @@ pub fn main() -> Result<(), String> {
     }
     
     Ok(())
-}
-
-
-fn print_type_of<T>(_: &T) {
-    println!("{}", std::any::type_name::<T>())
 }
