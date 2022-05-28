@@ -1,0 +1,15 @@
+
+bugs:
+    - enemies move across the screen too quickly
+
+first version:
+    - enemies that follow a pre-determined path
+    - hit-scan towers
+
+
+desired features:
+    - Smart targetting: no wasted bullets for towers that already have projectiles that are lethal
+    - large waves of enemies that are fed into the map one by one (not stacked)
+    - slow projectiles that "lock and chase" onto their target, similar to a homing missile. maybe this can leave a trail. the idea is for this to be visually pleasing to see the projectiles make swirls and spirals in the map
+    - enemies somehow react to music, maybe change their color, shape, size, vibrate
+    
