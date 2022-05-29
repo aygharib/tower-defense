@@ -1,9 +1,40 @@
-use sdl2::{video::Window, rect::Point, pixels::Color, render::Canvas};
+use cgmath::Vector2;
+use sdl2::pixels::Color;
+use sdl2::rect::{Point};
+use sdl2::render::Canvas;
+use sdl2::video::Window;
+
+use self::enemy::{Kind as EnemyKind, Enemy};
+
+mod enemy;
+
+pub struct Engine {
+    arena: Arena,
+    bag: Vec<EnemyKind>,
+}
+
+impl Engine {
+    pub fn new() -> Self {
+        Engine {
+            arena: Arena { width_in_pixels: 1920, height_in_pixels: 1080 },
+            bag: Vec::new()
+        }
+    }
+
+    fn refill_bag(&mut self) {
+        // generate enemies for the wave
+        for i in 0..5 {
+            // let a = Enemy::new(EnemyKind::Square, Vector2::new(0, 0));
+            self.bag.push(EnemyKind::Square);
+        }
+    }
+}
 
 pub struct Arena {
     width_in_pixels: u32,
     height_in_pixels: u32,
 }
+
 impl Arena {
     pub fn new(width_in_pixels: u32, height_in_pixels: u32) -> Arena {
         Arena {
