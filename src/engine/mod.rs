@@ -10,7 +10,7 @@ mod enemy;
 
 pub struct Engine {
     arena: Arena,
-    bag: Vec<EnemyKind>,
+    pub bag: Vec<Enemy>,
 }
 
 impl Engine {
@@ -21,11 +21,11 @@ impl Engine {
         }
     }
 
-    fn refill_bag(&mut self) {
+    pub fn refill_bag(&mut self) {
         // generate enemies for the wave
         for i in 0..5 {
-            // let a = Enemy::new(EnemyKind::Square, Vector2::new(0, 0));
-            self.bag.push(EnemyKind::Square);
+            let new_enemy = Enemy::new(EnemyKind::Square, Vector2::new(0, 0));
+            self.bag.push(new_enemy);
         }
     }
 }

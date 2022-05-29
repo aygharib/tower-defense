@@ -5,7 +5,7 @@ pub struct Enemy {
     // y: f64,
     // width: u32,
     // height: u32,
-    // speed: i32, // num pixels moved per second
+    // speed: i32,
     kind: Kind,
     position: Vector2<usize>,
 }
