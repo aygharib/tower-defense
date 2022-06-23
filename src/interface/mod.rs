@@ -61,27 +61,21 @@ impl Interface {
                 }
             }
     
-            self.draw(&mut canvas);
+            // self.draw(&mut canvas);
+            canvas.set_draw_color(BACKGROUND_COLOR);
+            canvas.clear();
+            self.draw_enemies(&mut canvas);
+            self.draw_hovered_tile(&mut canvas, 0, 0);
+            canvas.present();
     
             ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
         }
     }
-    
-    fn draw(&mut self, canvas: &mut Canvas<Window>) {
-        canvas.set_draw_color(BACKGROUND_COLOR);
-        canvas.clear();
-        
-        self.draw_enemies(canvas);
-        self.draw_hovered_tile(canvas, 0, 0);
-        canvas.present();
-    }
-    
+
     fn draw_enemies(&mut self, canvas: &mut Canvas<Window>) {
         for enemy in self.engine.bag.iter_mut() {
-            canvas.set_draw_color(Color::RGB(128, 128, 128));
-            canvas.fill_rect(Rect::new(enemy.position.x as i32, enemy.position.y as i32, 50, 50));
-            println!("{:?}", enemy.position);
             enemy.update_position();
+            enemy.draw(canvas);
         }
     }
     

@@ -4,12 +4,12 @@ use sdl2::{pixels::Color, rect::Rect, render::Canvas, video::Window};
 pub struct Enemy {
     width: u32,
     height: u32,
-    speed: i32,
+    speed: Vector2<f64>,
     pub position: Vector2<f64>,
 }
 
 impl Enemy {
-    pub fn new(width: u32, height: u32, speed: i32, position: Vector2<f64>) -> Enemy {
+    pub fn new(width: u32, height: u32, speed: Vector2<f64>, position: Vector2<f64>) -> Enemy {
         Enemy {
             width,
             height,
@@ -24,7 +24,7 @@ impl Enemy {
     }
 
     pub fn update_position(&mut self) {
-        self.position.x = self.position.x + self.speed as f64;
-        self.position.y = self.position.y + self.speed as f64;
+        self.position.x = self.position.x + self.speed.x;
+        self.position.y = self.position.y + self.speed.y;
     }
 }
