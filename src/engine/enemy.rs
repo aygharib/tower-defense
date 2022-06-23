@@ -1,49 +1,30 @@
 use cgmath::Vector2;
+use sdl2::{pixels::Color, rect::Rect, render::Canvas, video::Window};
 
 pub struct Enemy {
-    // x: f64,
-    // y: f64,
-    // width: u32,
-    // height: u32,
-    // speed: i32,
-    kind: Kind,
-    position: Vector2<usize>,
+    width: u32,
+    height: u32,
+    speed: i32,
+    pub position: Vector2<f64>,
 }
 
 impl Enemy {
-    pub fn new(kind: Kind, position: Vector2<usize>) -> Self {
-        Self {
-            kind,
+    pub fn new(width: u32, height: u32, speed: i32, position: Vector2<f64>) -> Enemy {
+        Enemy {
+            width,
+            height,
+            speed,
             position,
         }
     }
+
+    pub fn draw(&self, canvas: &mut Canvas<Window>) {
+        canvas.set_draw_color(Color::RGB(255, 255, 255));
+        canvas.draw_rect(Rect::new(self.position.x as i32, self.position.y as i32, self.width.try_into().unwrap(), self.height.try_into().unwrap())).unwrap();
+    }
+
+    pub fn update_position(&mut self) {
+        self.position.x = self.position.x + self.speed as f64;
+        self.position.y = self.position.y + self.speed as f64;
+    }
 }
-
-pub enum Kind { Square, Circle, Triangle }
-
-impl Kind {
-    pub const ALL: [Self; 3] = [Self::Square, Self::Circle, Self::Triangle];
-}
-
-// impl Enemy {
-//     pub fn new(x: f64, y: f64, width: u32, height: u32, speed: i32) -> Enemy {
-//         Enemy {
-//             x,
-//             y,
-//             width,
-//             height,
-//             speed,
-//         }
-//     }
-
-//     pub fn draw(&self, canvas: &mut Canvas<Window>) {
-//         canvas.set_draw_color(Color::RGB(255, 255, 255));
-//         canvas.draw_rect(Rect::new(self.x as i32, self.y as i32, self.width.try_into().unwrap(), self.height.try_into().unwrap())).unwrap();
-//     }
-
-//     pub fn update_position(&mut self, delta_x: f64, delta_y: f64) {
-//         self.x = self.x + delta_x * self.speed as f64;
-//         self.y = self.y + delta_y * self.speed as f64;
-//     }
-// }
-

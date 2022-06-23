@@ -4,7 +4,7 @@ use sdl2::rect::{Point};
 use sdl2::render::Canvas;
 use sdl2::video::Window;
 
-use self::enemy::{Kind as EnemyKind, Enemy};
+use self::enemy::{Enemy};
 
 mod enemy;
 
@@ -24,7 +24,7 @@ impl Engine {
     pub fn refill_bag(&mut self) {
         // generate enemies for the wave
         for i in 0..5 {
-            let new_enemy = Enemy::new(EnemyKind::Square, Vector2::new(0, 0));
+            let new_enemy = Enemy::new(50, 50, 5, Vector2::new((i*100) as f64, 0 as f64));
             self.bag.push(new_enemy);
         }
     }
