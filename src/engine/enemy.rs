@@ -1,6 +1,8 @@
 use cgmath::Vector2;
 use sdl2::{pixels::Color, rect::Rect, render::Canvas, video::Window};
 
+const ENEMY_COLOR: Color = Color::RGB(255, 255, 255);
+
 pub struct Enemy {
     width: u32,
     height: u32,
@@ -19,7 +21,7 @@ impl Enemy {
     }
 
     pub fn draw(&self, canvas: &mut Canvas<Window>) {
-        canvas.set_draw_color(Color::RGB(255, 255, 255));
+        canvas.set_draw_color(ENEMY_COLOR);
         canvas.draw_rect(Rect::new(self.position.x as i32, self.position.y as i32, self.width.try_into().unwrap(), self.height.try_into().unwrap())).unwrap();
     }
 

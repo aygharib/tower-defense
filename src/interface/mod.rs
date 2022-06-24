@@ -11,7 +11,8 @@ use sdl2::render::Canvas;
 
 use crate::engine::Engine;
 
-const INIT_SIZE: Vector2<u32> = Vector2::new(1024, 1024);
+pub const INIT_SIZE: Vector2<u32> = Vector2::new(800, 800);
+pub const TILE_SIZE: i32 = 50;
 const BACKGROUND_COLOR: Color = Color::RGB(0, 0, 0);
 
 pub struct Interface {
@@ -66,6 +67,7 @@ impl Interface {
             canvas.clear();
             self.draw_enemies(&mut canvas);
             self.draw_hovered_tile(&mut canvas, 0, 0);
+            self.engine.arena.draw_arena(&mut canvas);
             canvas.present();
     
             ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
@@ -79,11 +81,11 @@ impl Interface {
         }
     }
     
-    fn draw_hovered_tile(&self, canvas: &mut Canvas<Window>, mouse_x: i32, mouse_y: i32) {
-        let temp_x = (mouse_x / 50) * 50;
-        let temp_y = (mouse_y / 50) * 50;
+    fn draw_hovered_tile(&self, canvas: &mut Canvas<Window>, mouse_x: u32, mouse_y: u32) {
+        let hovered_tile_x = (mouse_x / TILE_SIZE as u32) * TILE_SIZE as u32;
+        let hovered_tile_y = (mouse_y / TILE_SIZE as u32) * TILE_SIZE as u32;
     
         canvas.set_draw_color(Color::RGB(128, 128, 128));
-        canvas.draw_rect(Rect::new(temp_x, temp_y, 50, 50));
+        canvas.draw_rect(Rect::new(hovered_tile_x as i32, hovered_tile_y as i32, TILE_SIZE as u32, TILE_SIZE as u32));
     }
 }
